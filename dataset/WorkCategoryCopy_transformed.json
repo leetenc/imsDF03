@@ -1,5 +1,5 @@
 {
-	"name": "WorkCategoryCopy",
+	"name": "WorkCategoryCopy_transformed",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "imsserver",
