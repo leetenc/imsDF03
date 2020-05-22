@@ -13,7 +13,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "[Work Category Copy]"
+			"table": "Work Category Copy"
 		}
 	}
 }
