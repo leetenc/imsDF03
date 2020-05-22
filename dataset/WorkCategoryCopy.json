@@ -5,6 +5,9 @@
 			"referenceName": "imsserver",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "SQL Data Target"
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": []
