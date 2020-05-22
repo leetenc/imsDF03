@@ -1,0 +1,38 @@
+{
+	"name": "WorkCategory",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "imsserver",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "SQL Data Source"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "hash_bus_key",
+				"type": "varchar"
+			},
+			{
+				"name": "work_category",
+				"type": "varchar"
+			},
+			{
+				"name": "effective_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "work_category_description",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Work Category"
+		}
+	}
+}
