@@ -1,0 +1,12 @@
+{
+	"name": "WorkCategoryCopy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "imsserver",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
