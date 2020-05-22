@@ -17,62 +17,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/imsserver')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('imsserver_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkCategory')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "imsserver",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "SQL Data Source"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "hash_bus_key",
-						"type": "varchar"
-					},
-					{
-						"name": "work_category",
-						"type": "varchar"
-					},
-					{
-						"name": "effective_date",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "work_category_description",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Work Category"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/imsserver')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -155,6 +99,73 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/WorkCategory')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "imsserver",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "SQL Data Source"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "hash_bus_key",
+						"type": "varchar"
+					},
+					{
+						"name": "work_category",
+						"type": "varchar"
+					},
+					{
+						"name": "effective_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "work_category_description",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Work Category"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/imsserver')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkCategoryCopy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "imsserver",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "SQL Data Target"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Work Category Copy"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/imsserver')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/WorkCategoryCopy_transformed')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -177,6 +188,19 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/imsserver')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/imsserver')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('imsserver_connectionString')]"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
@@ -211,36 +235,12 @@
 							"name": "SurrogateKey1"
 						}
 					],
-					"script": "source(output(\n\t\thash_bus_key as string,\n\t\twork_category as string,\n\t\teffective_date as timestamp,\n\t\twork_category_description as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource1 derive(effective_date = addMonths(effective_date,12),\n\t\tinsert_date = currentDate()) ~> DerivedColumn1\nDerivedColumn1 keyGenerate(output({Surrogate Key} as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+					"script": "source(output(\n\t\thash_bus_key as string,\n\t\twork_category as string,\n\t\teffective_date as timestamp,\n\t\twork_category_description as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource1 derive(effective_date = addMonths(effective_date,12),\n\t\tinsert_date = currentTimestamp()) ~> DerivedColumn1\nDerivedColumn1 keyGenerate(output({Surrogate Key} as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/WorkCategory')]",
 				"[concat(variables('factoryId'), '/datasets/WorkCategoryCopy_transformed')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkCategoryCopy')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "imsserver",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "SQL Data Target"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Work Category Copy"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/imsserver')]"
 			]
 		}
 	]
