@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "WorkCategoryCopy",
+						"referenceName": "WorkCategoryCopy_transformed",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
